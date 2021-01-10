@@ -26,21 +26,17 @@ print('y_test_onehot: ' + str(y_test_onehot.shape))
 # print_digit(X_train[0])
 # plt.show()
 
-flat_dim = int(28*28)
-
-X_train = X_train.reshape((X_train.shape[0],-1))
-X_test = X_test.reshape((X_test.shape[0],-1))
+X_train = np.expand_dims(X_train, axis=3)
+X_test = np.expand_dims(X_test, axis=3)
 
 print('X_train: ' + str(X_train.shape))
 print('X_test:  '  + str(X_test.shape))
 
-inputs = keras.Input(shape=(flat_dim), name="digit")
+inputs = keras.Input(shape=(28, 28, 1), name="digit")
 
-x = layers.Dense(100, 
-                activation="relu", 
-                name="dense_1",
-                kernel_initializer='random_normal',
-                bias_initializer='zeros')(inputs)
+x = layers.Conv2D(filters=576, kernel_size=(4, 4), activation="relu")(inputs)
+# Apply global average pooling to get flat feature vectors
+x = layers.GlobalAveragePooling2D()(x)
 
 outputs = layers.Dense(10, activation="softmax", name="predictions")(x)
 model = keras.Model(inputs=inputs, outputs=outputs)
